@@ -47,14 +47,15 @@ pipeline {
         // APPZILLON PROJECT
         // ============================================================
 
-        APPZ_ARTIFACTS = 'D:/forDeploy'
+        APPZ_ARTIFACTS = 'D:\forDeploy'
 
-        QUIZZ_PROJECT = 'D:/MONTH-2/Week-4/wednesday/quizzz/quizzz'
+        QUIZZ_PROJECT = 'C:\Users\Kavi.bharathi\Downloads\quizapp\quizapp'
 
-        QUIZZ_BIN = 'D:/MONTH-2/Week-4/wednesday/quizzz/quizzz/bin'
+        QUIZZ_BIN = 'C:\Users\Kavi.bharathi\Downloads\quizapp\quizapp\bin'
 
         // ============================================================
         // DATABASE
+
         // ============================================================
 
         DB_NAME = 'quiz_app'
