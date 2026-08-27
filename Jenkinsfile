@@ -1070,7 +1070,6 @@ pipeline {
         // ============================================================
         // 12. PLAYWRIGHT
         // ============================================================
- 
 stage('Playwright UI Tests') {
 
     steps {
@@ -1092,9 +1091,7 @@ stage('Playwright UI Tests') {
             echo %PLAYWRIGHT_DIR%
 
             if not exist "%PLAYWRIGHT_DIR%" (
-                echo.
-                echo ERROR: Jenkins workspace not found.
-                echo %PLAYWRIGHT_DIR%
+                echo ERROR: Playwright directory not found.
                 exit /b 1
             )
 
@@ -1106,25 +1103,11 @@ stage('Playwright UI Tests') {
 
             echo.
             echo ==========================================
-            echo WORKSPACE FILES
-            echo ==========================================
-
-            dir
-
-            echo.
-            echo ==========================================
-            echo PACKAGE.JSON CHECK
+            echo PACKAGE.JSON
             echo ==========================================
 
             if not exist package.json (
-                echo.
-                echo ERROR: package.json not found in:
-                echo %PLAYWRIGHT_DIR%
-                echo.
-                echo Please make sure package.json is committed to GitHub.
-                echo.
-                echo Current files:
-                dir
+                echo ERROR: package.json not found.
                 exit /b 1
             )
 
@@ -1132,13 +1115,44 @@ stage('Playwright UI Tests') {
 
             echo.
             echo ==========================================
-            echo INSTALLING PLAYWRIGHT DEPENDENCIES
+            echo PLAYWRIGHT CONFIG
+            echo ==========================================
+
+            if not exist playwright.config.js (
+                echo ERROR: playwright.config.js not found.
+                exit /b 1
+            )
+
+            echo playwright.config.js found.
+
+            echo.
+            echo ==========================================
+            echo FINDING TEST FILES
+            echo ==========================================
+
+            if exist tests (
+                echo Tests folder found:
+                dir /s /b tests
+            ) else (
+                echo WARNING: tests folder does not exist.
+            )
+
+            echo.
+            echo Searching for .spec.js files:
+            dir /s /b *.spec.js 2>nul
+
+            echo.
+            echo Searching for .spec.ts files:
+            dir /s /b *.spec.ts 2>nul
+
+            echo.
+            echo ==========================================
+            echo INSTALLING DEPENDENCIES
             echo ==========================================
 
             call npm install
 
             if errorlevel 1 (
-                echo.
                 echo ERROR: npm install failed.
                 exit /b 1
             )
@@ -1151,22 +1165,24 @@ stage('Playwright UI Tests') {
             call npx playwright install chromium
 
             if errorlevel 1 (
-                echo.
-                echo ERROR: Playwright Chromium installation failed.
+                echo ERROR: Chromium installation failed.
                 exit /b 1
             )
 
             echo.
             echo ==========================================
-            echo RUNNING PLAYWRIGHT TEST
+            echo RUNNING PLAYWRIGHT TESTS
             echo ==========================================
 
-            call npx playwright test tests/05-home-quiz-flow.spec.js --headed --project=chromium
+            call npx playwright test --headed --project=chromium
 
             set "PW_EXIT=%errorlevel%"
 
             echo.
-            echo Playwright exit code:
+            echo ==========================================
+            echo PLAYWRIGHT EXIT CODE
+            echo ==========================================
+
             echo %PW_EXIT%
 
             if %PW_EXIT% NEQ 0 (
@@ -1177,7 +1193,7 @@ stage('Playwright UI Tests') {
                 echo ==========================================
 
                 if exist playwright-report\\index.html (
-                    echo Opening Playwright report...
+                    echo Playwright report found.
                     start "" playwright-report\\index.html
                 )
 
