@@ -47,15 +47,14 @@ pipeline {
         // APPZILLON PROJECT
         // ============================================================
 
-        APPZ_ARTIFACTS = 'D:\forDeploy'
+        APPZ_ARTIFACTS = 'D:/forDeploy'
 
-        QUIZZ_PROJECT = 'C:\Users\Kavi.bharathi\Downloads\quizapp\quizapp'
+        QUIZZ_PROJECT = 'C:/Users/Kavi.bharathi/Downloads/quizapp/quizapp'
 
-        QUIZZ_BIN = 'C:\Users\Kavi.bharathi\Downloads\quizapp\quizapp\bin'
+        QUIZZ_BIN = 'C:/Users/Kavi.bharathi/Downloads/quizapp/quizapp/bin'
 
         // ============================================================
         // DATABASE
-
         // ============================================================
 
         DB_NAME = 'quiz_app'
@@ -407,7 +406,6 @@ pipeline {
                             Select-Object -First 1
 
                         if ($file) {
-
                             $webWar = $file.FullName
                         }
                     }
@@ -426,7 +424,6 @@ pipeline {
                             Select-Object -First 1
 
                         if ($file) {
-
                             $serverWar = $file.FullName
                         }
                     }
@@ -444,7 +441,6 @@ pipeline {
                             Select-Object -First 1
 
                         if ($directory) {
-
                             $webProps = $directory.FullName
                         }
                     }
@@ -462,7 +458,6 @@ pipeline {
                             Select-Object -First 1
 
                         if ($directory) {
-
                             $serverProps = $directory.FullName
                         }
                     }
