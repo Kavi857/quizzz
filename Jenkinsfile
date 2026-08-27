@@ -1071,102 +1071,127 @@ pipeline {
         // 12. PLAYWRIGHT
         // ============================================================
  
-        stage('Playwright UI Tests') {
- 
-            steps {
- 
-                echo '=========================================='
-                echo 'PLAYWRIGHT UI TESTS'
-                echo '=========================================='
- 
-                bat '''
-                    @echo off
- 
-                    echo Playwright directory:
-                    echo %PLAYWRIGHT_DIR%
- 
-                    if not exist "%PLAYWRIGHT_DIR%" (
- 
-                        echo ERROR: Playwright directory not found.
- 
-                        echo %PLAYWRIGHT_DIR%
- 
-                        exit /b 1
-                    )
- 
-                    cd /d "%PLAYWRIGHT_DIR%"
- 
-                    echo.
-                    echo Current directory:
-                    cd
- 
-                    echo.
-                    echo ==========================================
-                    echo PACKAGE.JSON
-                    echo ==========================================
- 
-                    if not exist package.json (
- 
-                        echo ERROR: package.json not found.
- 
-                        dir
- 
-                        exit /b 1
-                    )
- 
-                    echo package.json found.
- 
-                    echo.
-                    echo ==========================================
-                    echo INSTALLING PLAYWRIGHT DEPENDENCIES
-                    echo ==========================================
- 
-                    npm install
- 
-                    if errorlevel 1 (
- 
-                        echo ERROR: npm install failed.
- 
-                        exit /b 1
-                    )
- 
-                    echo.
-                    echo ==========================================
-                    echo RUNNING PLAYWRIGHT TEST
-                    echo ==========================================
- 
-                    npx playwright test tests/05-home-quiz-flow.spec.js --headed --project=chromium
- 
-                    set PW_EXIT=%errorlevel%
- 
-                    echo.
-                    echo Playwright exit code:
-                    echo %PW_EXIT%
- 
-                    if %PW_EXIT% NEQ 0 (
- 
-                        echo.
-                        echo ==========================================
-                        echo PLAYWRIGHT TEST FAILED
-                        echo ==========================================
- 
-                        if exist playwright-report\\index.html (
- 
-                            echo Opening Playwright report...
- 
-                            start "" playwright-report\\index.html
-                        )
- 
-                        exit /b %PW_EXIT%
-                    )
- 
-                    echo.
-                    echo ==========================================
-                    echo PLAYWRIGHT TEST PASSED
-                    echo ==========================================
-                '''
-            }
-        }
+stage('Playwright UI Tests') {
+
+    steps {
+
+        echo '=========================================='
+        echo 'PLAYWRIGHT UI TESTS'
+        echo '=========================================='
+
+        bat '''
+            @echo off
+
+            echo ==========================================
+            echo PLAYWRIGHT DIRECTORY
+            echo ==========================================
+
+            set "PLAYWRIGHT_DIR=%WORKSPACE%"
+
+            echo Playwright directory:
+            echo %PLAYWRIGHT_DIR%
+
+            if not exist "%PLAYWRIGHT_DIR%" (
+                echo.
+                echo ERROR: Jenkins workspace not found.
+                echo %PLAYWRIGHT_DIR%
+                exit /b 1
+            )
+
+            cd /d "%PLAYWRIGHT_DIR%"
+
+            echo.
+            echo Current directory:
+            cd
+
+            echo.
+            echo ==========================================
+            echo WORKSPACE FILES
+            echo ==========================================
+
+            dir
+
+            echo.
+            echo ==========================================
+            echo PACKAGE.JSON CHECK
+            echo ==========================================
+
+            if not exist package.json (
+                echo.
+                echo ERROR: package.json not found in:
+                echo %PLAYWRIGHT_DIR%
+                echo.
+                echo Please make sure package.json is committed to GitHub.
+                echo.
+                echo Current files:
+                dir
+                exit /b 1
+            )
+
+            echo package.json found.
+
+            echo.
+            echo ==========================================
+            echo INSTALLING PLAYWRIGHT DEPENDENCIES
+            echo ==========================================
+
+            call npm install
+
+            if errorlevel 1 (
+                echo.
+                echo ERROR: npm install failed.
+                exit /b 1
+            )
+
+            echo.
+            echo ==========================================
+            echo INSTALLING CHROMIUM
+            echo ==========================================
+
+            call npx playwright install chromium
+
+            if errorlevel 1 (
+                echo.
+                echo ERROR: Playwright Chromium installation failed.
+                exit /b 1
+            )
+
+            echo.
+            echo ==========================================
+            echo RUNNING PLAYWRIGHT TEST
+            echo ==========================================
+
+            call npx playwright test tests/05-home-quiz-flow.spec.js --headed --project=chromium
+
+            set "PW_EXIT=%errorlevel%"
+
+            echo.
+            echo Playwright exit code:
+            echo %PW_EXIT%
+
+            if %PW_EXIT% NEQ 0 (
+
+                echo.
+                echo ==========================================
+                echo PLAYWRIGHT TEST FAILED
+                echo ==========================================
+
+                if exist playwright-report\\index.html (
+                    echo Opening Playwright report...
+                    start "" playwright-report\\index.html
+                )
+
+                exit /b %PW_EXIT%
+            )
+
+            echo.
+            echo ==========================================
+            echo PLAYWRIGHT TEST PASSED
+            echo ==========================================
+
+        '''
+    }
+}
     }
  
  
