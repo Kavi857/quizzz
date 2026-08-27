@@ -26,7 +26,7 @@ pipeline {
         // SPRING BOOT BACKEND
         // ============================================================
 
-        APP_JAR = 'target/quiz-bg-1.0.0.jar'
+        APP_JAR = 'target/quizapp.jar'
 
         BACKEND_PORT = '8080'
 
