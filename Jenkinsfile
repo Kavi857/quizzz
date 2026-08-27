@@ -31,7 +31,7 @@ pipeline {
         // BACKEND
         // ------------------------------------------------------------
 
-        APP_JAR = 'target/quiz-bg-1.0.0.jar'
+        APP_JAR = 'target/quizapp
         BACKEND_PORT = '8080'
         BACKEND_URL = 'http://localhost:8080/api/categories'
 
