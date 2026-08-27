@@ -40,7 +40,8 @@ pipeline {
 
         TOMCAT_PORT = '9090'
 
-        APPZILLON_URL = 'http://localhost:9090/quizapp'
+        // WAR is deployed as quizzz.war
+        APPZILLON_URL = 'http://localhost:9090/quizzz'
 
         // ============================================================
         // APPZILLON PROJECT
@@ -364,14 +365,22 @@ pipeline {
                     Write-Host "QUIZZ_BIN       : $env:QUIZZ_BIN"
                     Write-Host "APPZ_ARTIFACTS  : $env:APPZ_ARTIFACTS"
 
+                    # ------------------------------------------------
+                    # CHECK TOMCAT
+                    # ------------------------------------------------
+
                     if (-not (Test-Path $env:APPZ_HOME)) {
+
                         Write-Host "ERROR: Tomcat directory not found."
                         Write-Host $env:APPZ_HOME
+
                         exit 1
                     }
 
                     if (-not (Test-Path "$env:APPZ_HOME/bin/catalina.bat")) {
+
                         Write-Host "ERROR: catalina.bat not found."
+
                         exit 1
                     }
 
@@ -383,9 +392,9 @@ pipeline {
                     $serverProps = $null
                     $dbPath = $null
 
-                    // ------------------------------------------------
-                    // WEB WAR
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # WEB WAR
+                    # ------------------------------------------------
 
                     if (Test-Path "$env:QUIZZ_BIN/Web") {
 
@@ -397,13 +406,14 @@ pipeline {
                             Select-Object -First 1
 
                         if ($file) {
+
                             $webWar = $file.FullName
                         }
                     }
 
-                    // ------------------------------------------------
-                    // SERVER WAR
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # SERVER WAR
+                    # ------------------------------------------------
 
                     if (Test-Path "$env:QUIZZ_BIN/Server") {
 
@@ -415,13 +425,14 @@ pipeline {
                             Select-Object -First 1
 
                         if ($file) {
+
                             $serverWar = $file.FullName
                         }
                     }
 
-                    // ------------------------------------------------
-                    // WEB PROPERTIES
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # WEB PROPERTIES
+                    # ------------------------------------------------
 
                     if (Test-Path "$env:QUIZZ_BIN/Web/Properties") {
 
@@ -432,13 +443,14 @@ pipeline {
                             Select-Object -First 1
 
                         if ($directory) {
+
                             $webProps = $directory.FullName
                         }
                     }
 
-                    // ------------------------------------------------
-                    // SERVER PROPERTIES
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # SERVER PROPERTIES
+                    # ------------------------------------------------
 
                     if (Test-Path "$env:QUIZZ_BIN/Server/Properties") {
 
@@ -449,13 +461,14 @@ pipeline {
                             Select-Object -First 1
 
                         if ($directory) {
+
                             $serverProps = $directory.FullName
                         }
                     }
 
-                    // ------------------------------------------------
-                    // DATABASE
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # DATABASE
+                    # ------------------------------------------------
 
                     $possibleDbPaths = @(
                         "$env:QUIZZ_BIN/Server/Database/MySql",
@@ -473,9 +486,9 @@ pipeline {
                         }
                     }
 
-                    // ------------------------------------------------
-                    // FALLBACK WEB WAR
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # FALLBACK WEB WAR
+                    # ------------------------------------------------
 
                     if (-not $webWar) {
 
@@ -485,9 +498,9 @@ pipeline {
                         }
                     }
 
-                    // ------------------------------------------------
-                    // FALLBACK SERVER WAR
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # FALLBACK SERVER WAR
+                    # ------------------------------------------------
 
                     if (-not $serverWar) {
 
@@ -497,9 +510,9 @@ pipeline {
                         }
                     }
 
-                    // ------------------------------------------------
-                    // FALLBACK WEB PROPERTIES
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # FALLBACK WEB PROPERTIES
+                    # ------------------------------------------------
 
                     if (-not $webProps) {
 
@@ -509,9 +522,9 @@ pipeline {
                         }
                     }
 
-                    // ------------------------------------------------
-                    // FALLBACK SERVER PROPERTIES
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # FALLBACK SERVER PROPERTIES
+                    # ------------------------------------------------
 
                     if (-not $serverProps) {
 
@@ -532,6 +545,10 @@ pipeline {
                     Write-Host "Server Props : $serverProps"
                     Write-Host "DB Path      : $dbPath"
 
+                    # ------------------------------------------------
+                    # WEB WAR REQUIRED
+                    # ------------------------------------------------
+
                     if (-not $webWar) {
 
                         Write-Host ""
@@ -539,6 +556,10 @@ pipeline {
 
                         exit 1
                     }
+
+                    # ------------------------------------------------
+                    # SAVE VARIABLES
+                    # ------------------------------------------------
 
                     $content = @(
                         "WEB_WAR=$webWar"
@@ -592,6 +613,10 @@ pipeline {
 
                     $libPath = "$env:APPZ_HOME/lib"
 
+                    # ------------------------------------------------
+                    # CREATE LIB DIRECTORY
+                    # ------------------------------------------------
+
                     if (-not (Test-Path $libPath)) {
 
                         New-Item `
@@ -604,9 +629,9 @@ pipeline {
                     Write-Host "Tomcat LIB:"
                     Write-Host $libPath
 
-                    // ------------------------------------------------
-                    // WEB PROPERTIES
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # WEB PROPERTIES
+                    # ------------------------------------------------
 
                     if ($webProps -and (Test-Path $webProps)) {
 
@@ -627,9 +652,9 @@ pipeline {
                         Write-Host "WARNING: Web properties not found."
                     }
 
-                    // ------------------------------------------------
-                    // SERVER PROPERTIES
-                    // ------------------------------------------------
+                    # ------------------------------------------------
+                    # SERVER PROPERTIES
+                    # ------------------------------------------------
 
                     if ($serverProps -and (Test-Path $serverProps)) {
 
@@ -853,12 +878,15 @@ pipeline {
                     echo ==========================================
 
                     rmdir /S /Q "%APPZ_HOME%\\webapps\\quizzz" >nul 2>&1
+
                     rmdir /S /Q "%APPZ_HOME%\\webapps\\AppzillonServer" >nul 2>&1
 
                     del /F /Q "%APPZ_HOME%\\webapps\\quizzz.war" >nul 2>&1
+
                     del /F /Q "%APPZ_HOME%\\webapps\\AppzillonServer.war" >nul 2>&1
 
                     rmdir /S /Q "%APPZ_HOME%\\work\\Catalina\\localhost\\quizzz" >nul 2>&1
+
                     rmdir /S /Q "%APPZ_HOME%\\work\\Catalina\\localhost\\AppzillonServer" >nul 2>&1
 
                     echo.
@@ -994,8 +1022,11 @@ pipeline {
                         echo TOMCAT LOGS:
 
                         if exist "%APPZ_HOME%\\logs\\catalina.out" (
+
                             powershell -Command "Get-Content '%APPZ_HOME%\\logs\\catalina.out' -Tail 60"
+
                         ) else (
+
                             echo catalina.out not found.
                         )
 
@@ -1124,7 +1155,9 @@ pipeline {
                         echo ==========================================
 
                         if exist playwright-report\\index.html (
+
                             echo Opening Playwright report...
+
                             start "" playwright-report\\index.html
                         )
 
@@ -1142,7 +1175,7 @@ pipeline {
 
 
     // ================================================================
-    // POST
+    // POST ACTIONS
     // ================================================================
 
     post {
@@ -1154,11 +1187,14 @@ pipeline {
             echo '=========================================='
 
             echo 'Backend: http://localhost:8080'
+
             echo 'Backend API: http://localhost:8080/api/categories'
-            echo 'Appzillon: http://localhost:9090/quizapp'
+
+            echo 'Appzillon: http://localhost:9090/quizzz'
 
             echo '=========================================='
         }
+
 
         failure {
 
@@ -1167,7 +1203,9 @@ pipeline {
             echo '=========================================='
 
             echo 'Check the failed Jenkins stage.'
+
             echo 'Backend log: backend.log'
+
             echo 'Tomcat logs: D:/apache-tomcat-9.0.53-windows-x64/apache-tomcat-9.0.53/logs'
 
             echo '=========================================='
