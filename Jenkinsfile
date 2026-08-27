@@ -69,7 +69,7 @@ pipeline {
         // PLAYWRIGHT
         // ============================================================
 
-        PLAYWRIGHT_DIR = 'C:\Users\Kavi.bharathi\Downloads\quiz-app-backend (1)\quiz-app\src\test\java\com\example\QuizTesting.java'
+PLAYWRIGHT_DIR = 'C:/Users/Kavi.bharathi/Downloads/quiz-app-backend (1)/quiz-app'
     }
 
 
