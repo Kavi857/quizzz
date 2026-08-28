@@ -69,7 +69,7 @@ pipeline {
         // PLAYWRIGHT
         // ============================================================
  
-        PLAYWRIGHT_DIR = 'C:/Users/Kavi.bharathi/Downloads/quiz-app-backend (1)/quiz-app/src/test/java/com/example/QuizTesting.java'
+        PLAYWRIGHT_DIR = 'D:/Test'
     }
  
  
@@ -1068,34 +1068,28 @@ pipeline {
  
  
         // ============================================================
-        // 12. PLAYWRIGHT
-        // ============================================================
+// 12. PLAYWRIGHT JAVA UI TESTS
+// ============================================================
+
 stage('Playwright UI Tests') {
 
     steps {
 
         echo '=========================================='
-        echo 'PLAYWRIGHT UI TESTS'
+        echo 'PLAYWRIGHT JAVA UI TESTS'
         echo '=========================================='
 
         bat '''
             @echo off
 
             echo ==========================================
-            echo PLAYWRIGHT DIRECTORY
+            echo PLAYWRIGHT JAVA TEST
             echo ==========================================
 
-            set "PLAYWRIGHT_DIR=%WORKSPACE%"
+            echo Workspace:
+            echo %WORKSPACE%
 
-            echo Playwright directory:
-            echo %PLAYWRIGHT_DIR%
-
-            if not exist "%PLAYWRIGHT_DIR%" (
-                echo ERROR: Playwright directory not found.
-                exit /b 1
-            )
-
-            cd /d "%PLAYWRIGHT_DIR%"
+            cd /d "%WORKSPACE%"
 
             echo.
             echo Current directory:
@@ -1103,84 +1097,55 @@ stage('Playwright UI Tests') {
 
             echo.
             echo ==========================================
-            echo PACKAGE.JSON
+            echo JAVA VERSION
             echo ==========================================
 
-            if not exist package.json (
-                echo ERROR: package.json not found.
-                exit /b 1
-            )
-
-            echo package.json found.
+            java -version
 
             echo.
             echo ==========================================
-            echo PLAYWRIGHT CONFIG
+            echo MAVEN VERSION
             echo ==========================================
 
-            if not exist playwright.config.js (
-                echo ERROR: playwright.config.js not found.
-                exit /b 1
-            )
-
-            echo playwright.config.js found.
+            mvn -version
 
             echo.
             echo ==========================================
-            echo FINDING TEST FILES
+            echo CHECKING TEST FILE
             echo ==========================================
 
-            if exist tests (
-                echo Tests folder found:
-                dir /s /b tests
+            if exist "src\\test\\java\\QuizTesting.java" (
+
+                echo QuizTesting.java found.
+
             ) else (
-                echo WARNING: tests folder does not exist.
-            )
 
-            echo.
-            echo Searching for .spec.js files:
-            dir /s /b *.spec.js 2>nul
+                echo QuizTesting.java not found in:
+                echo src\\test\\java\\QuizTesting.java
 
-            echo.
-            echo Searching for .spec.ts files:
-            dir /s /b *.spec.ts 2>nul
+                echo.
+                echo Searching workspace...
 
-            echo.
-            echo ==========================================
-            echo INSTALLING DEPENDENCIES
-            echo ==========================================
+                dir /s /b QuizTesting.java 2>nul
 
-            call npm install
+                echo.
+                echo ERROR: QuizTesting.java is not inside the Maven test source folder.
 
-            if errorlevel 1 (
-                echo ERROR: npm install failed.
                 exit /b 1
             )
 
             echo.
             echo ==========================================
-            echo INSTALLING CHROMIUM
+            echo RUNNING PLAYWRIGHT TEST
             echo ==========================================
 
-            call npx playwright install chromium
-
-            if errorlevel 1 (
-                echo ERROR: Chromium installation failed.
-                exit /b 1
-            )
-
-            echo.
-            echo ==========================================
-            echo RUNNING PLAYWRIGHT TESTS
-            echo ==========================================
-
-            call npx playwright test --headed --project=chromium
+            mvn test -Dtest=QuizTesting
 
             set "PW_EXIT=%errorlevel%"
 
             echo.
             echo ==========================================
-            echo PLAYWRIGHT EXIT CODE
+            echo TEST EXIT CODE
             echo ==========================================
 
             echo %PW_EXIT%
@@ -1189,27 +1154,19 @@ stage('Playwright UI Tests') {
 
                 echo.
                 echo ==========================================
-                echo PLAYWRIGHT TEST FAILED
+                echo PLAYWRIGHT JAVA TEST FAILED
                 echo ==========================================
-
-                if exist playwright-report\\index.html (
-                    echo Playwright report found.
-                    start "" playwright-report\\index.html
-                )
 
                 exit /b %PW_EXIT%
             )
 
             echo.
             echo ==========================================
-            echo PLAYWRIGHT TEST PASSED
+            echo PLAYWRIGHT JAVA TEST PASSED
             echo ==========================================
-
         '''
     }
 }
-    }
- 
  
     // ================================================================
     // POST ACTIONS
