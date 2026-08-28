@@ -18,6 +18,7 @@ public class QuizTesting {
             Browser browser = playwright.chromium().launch(
                     new BrowserType.LaunchOptions()
                             .setHeadless(false)
+                        //     .setChannel(chro)
             );
 
             System.out.println("Browser opened");
