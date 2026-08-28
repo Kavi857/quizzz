@@ -353,21 +353,20 @@ pipeline {
                 echo '=========================================='
 
                 powershell '''
-
                     $ErrorActionPreference = "Stop"
 
                     Write-Host "=========================================="
                     Write-Host "APPZILLON CONFIGURATION"
                     Write-Host "=========================================="
 
-                    Write-Host "APPZ_HOME       : $env:APPZ_HOME"
-                    Write-Host "QUIZZ_PROJECT   : $env:QUIZZ_PROJECT"
-                    Write-Host "QUIZZ_BIN       : $env:QUIZZ_BIN"
-                    Write-Host "APPZ_ARTIFACTS  : $env:APPZ_ARTIFACTS"
+                    Write-Host "APPZ_HOME      : $env:APPZ_HOME"
+                    Write-Host "QUIZZ_PROJECT  : $env:QUIZZ_PROJECT"
+                    Write-Host "QUIZZ_BIN      : $env:QUIZZ_BIN"
+                    Write-Host "APPZ_ARTIFACTS : $env:APPZ_ARTIFACTS"
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # CHECK TOMCAT
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (-not (Test-Path $env:APPZ_HOME)) {
 
@@ -392,9 +391,9 @@ pipeline {
                     $serverProps = $null
                     $dbPath = $null
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # WEB WAR
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (Test-Path "$env:QUIZZ_BIN/Web") {
 
@@ -410,9 +409,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # SERVER WAR
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (Test-Path "$env:QUIZZ_BIN/Server") {
 
@@ -428,9 +427,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # WEB PROPERTIES
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (Test-Path "$env:QUIZZ_BIN/Web/Properties") {
 
@@ -445,9 +444,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # SERVER PROPERTIES
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (Test-Path "$env:QUIZZ_BIN/Server/Properties") {
 
@@ -462,9 +461,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # DATABASE
-                    # ------------------------------------------------
+                    # ==================================================
 
                     $possibleDbPaths = @(
                         "$env:QUIZZ_BIN/Server/Database/MySql",
@@ -482,9 +481,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # FALLBACK WEB WAR
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (-not $webWar) {
 
@@ -494,9 +493,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # FALLBACK SERVER WAR
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (-not $serverWar) {
 
@@ -506,9 +505,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # FALLBACK WEB PROPERTIES
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (-not $webProps) {
 
@@ -518,9 +517,9 @@ pipeline {
                         }
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # FALLBACK SERVER PROPERTIES
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (-not $serverProps) {
 
@@ -529,6 +528,10 @@ pipeline {
                             $serverProps = "$env:APPZ_ARTIFACTS/lib/AppzillonServer"
                         }
                     }
+
+                    # ==================================================
+                    # DISPLAY
+                    # ==================================================
 
                     Write-Host ""
                     Write-Host "=========================================="
@@ -541,9 +544,9 @@ pipeline {
                     Write-Host "Server Props : $serverProps"
                     Write-Host "DB Path      : $dbPath"
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # WEB WAR REQUIRED
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if (-not $webWar) {
 
@@ -553,9 +556,9 @@ pipeline {
                         exit 1
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # SAVE VARIABLES
-                    # ------------------------------------------------
+                    # ==================================================
 
                     $content = @(
                         "WEB_WAR=$webWar"
@@ -589,7 +592,6 @@ pipeline {
                 echo '=========================================='
 
                 powershell '''
-
                     $ErrorActionPreference = "Stop"
 
                     $vars = Get-Content `
@@ -610,9 +612,9 @@ pipeline {
 
                     $libPath = "$env:APPZ_HOME/lib"
 
-                    # ------------------------------------------------
-                    # CREATE LIB DIRECTORY
-                    # ------------------------------------------------
+                    # ==================================================
+                    # CREATE LIB
+                    # ==================================================
 
                     if (-not (Test-Path $libPath)) {
 
@@ -626,9 +628,9 @@ pipeline {
                     Write-Host "Tomcat LIB:"
                     Write-Host $libPath
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # WEB PROPERTIES
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if ($webProps -and (Test-Path $webProps)) {
 
@@ -649,9 +651,9 @@ pipeline {
                         Write-Host "WARNING: Web properties not found."
                     }
 
-                    # ------------------------------------------------
+                    # ==================================================
                     # SERVER PROPERTIES
-                    # ------------------------------------------------
+                    # ==================================================
 
                     if ($serverProps -and (Test-Path $serverProps)) {
 
@@ -677,7 +679,7 @@ pipeline {
 
 
         // ============================================================
-        // 8. DATABASE
+        // 8. DATABASE SETUP
         // ============================================================
 
         stage('Database Setup') {
@@ -689,7 +691,6 @@ pipeline {
                 echo '=========================================='
 
                 bat '''
-
                     @echo off
 
                     echo Database:
@@ -703,7 +704,7 @@ pipeline {
 
                     if not exist "%MYSQL_EXE%" (
 
-                        echo mysql.exe not found in configured location.
+                        echo mysql.exe not found.
 
                         where mysql >nul 2>&1
 
@@ -813,7 +814,6 @@ pipeline {
                 echo '=========================================='
 
                 bat '''
-
                     @echo off
 
                     set "WEB_WAR="
@@ -877,15 +877,12 @@ pipeline {
                     echo ==========================================
 
                     rmdir /S /Q "%APPZ_HOME%\\webapps\\quizzz" >nul 2>&1
-
                     rmdir /S /Q "%APPZ_HOME%\\webapps\\AppzillonServer" >nul 2>&1
 
                     del /F /Q "%APPZ_HOME%\\webapps\\quizzz.war" >nul 2>&1
-
                     del /F /Q "%APPZ_HOME%\\webapps\\AppzillonServer.war" >nul 2>&1
 
                     rmdir /S /Q "%APPZ_HOME%\\work\\Catalina\\localhost\\quizzz" >nul 2>&1
-
                     rmdir /S /Q "%APPZ_HOME%\\work\\Catalina\\localhost\\AppzillonServer" >nul 2>&1
 
                     echo.
@@ -971,7 +968,6 @@ pipeline {
                 echo '=========================================='
 
                 bat '''
-
                     @echo off
 
                     set RETRIES=30
@@ -1056,7 +1052,6 @@ pipeline {
                 echo '=========================================='
 
                 bat '''
-
                     @echo off
 
                     echo Appzillon URL:
@@ -1073,7 +1068,68 @@ pipeline {
 
 
         // ============================================================
-        // 12. PLAYWRIGHT JAVA UI TESTS
+        // 12. INSTALL PLAYWRIGHT BROWSER
+        // ============================================================
+
+        stage('Install Playwright Browser') {
+
+            steps {
+
+                echo '=========================================='
+                echo 'INSTALLING PLAYWRIGHT BROWSER'
+                echo '=========================================='
+
+                bat '''
+                    @echo off
+
+                    set "JAVA_HOME=%JAVA_HOME%"
+                    set "PATH=%JAVA_HOME%\\bin;%MAVEN_HOME%\\bin;%PATH%"
+
+                    cd /d "%WORKSPACE%"
+
+                    echo.
+                    echo Workspace:
+                    echo %WORKSPACE%
+
+                    echo.
+                    echo Java:
+                    java -version
+
+                    echo.
+                    echo Maven:
+                    mvn -version
+
+                    echo.
+                    echo ==========================================
+                    echo PLAYWRIGHT BROWSER INSTALL
+                    echo ==========================================
+
+                    mvn exec:java ^
+                        -Dexec.classpathScope=test ^
+                        -Dexec.mainClass=com.microsoft.playwright.CLI ^
+                        -Dexec.args="install chromium"
+
+                    if errorlevel 1 (
+
+                        echo.
+                        echo ==========================================
+                        echo PLAYWRIGHT BROWSER INSTALL FAILED
+                        echo ==========================================
+
+                        exit /b 1
+                    )
+
+                    echo.
+                    echo ==========================================
+                    echo PLAYWRIGHT CHROMIUM INSTALLED
+                    echo ==========================================
+                '''
+            }
+        }
+
+
+        // ============================================================
+        // 13. PLAYWRIGHT JAVA UI TESTS
         // ============================================================
 
         stage('Playwright UI Tests') {
@@ -1085,17 +1141,20 @@ pipeline {
                 echo '=========================================='
 
                 bat '''
-
                     @echo off
 
+                    set "JAVA_HOME=%JAVA_HOME%"
+                    set "PATH=%JAVA_HOME%\\bin;%MAVEN_HOME%\\bin;%PATH%"
+
+                    cd /d "%WORKSPACE%"
+
+                    echo.
                     echo ==========================================
                     echo PLAYWRIGHT JAVA TEST
                     echo ==========================================
 
                     echo Workspace:
                     echo %WORKSPACE%
-
-                    cd /d "%WORKSPACE%"
 
                     echo.
                     echo Current directory:
@@ -1117,18 +1176,19 @@ pipeline {
 
                     echo.
                     echo ==========================================
-                    echo CHECKING TEST FILE
+                    echo CHECKING PLAYWRIGHT TEST
                     echo ==========================================
 
                     if exist "src\\test\\java\\com\\example\\QuizTesting.java" (
 
                         echo QuizTesting.java found.
-                        echo Location:
+
+                        echo.
+                        echo Test file:
                         echo src\\test\\java\\com\\example\\QuizTesting.java
 
                     ) else (
 
-                        echo.
                         echo ERROR: QuizTesting.java not found.
 
                         echo.
@@ -1141,7 +1201,7 @@ pipeline {
                         dir /s /b QuizTesting.java 2>nul
 
                         echo.
-                        echo ERROR: QuizTesting.java is not inside the expected Maven test source folder.
+                        echo ERROR: Playwright test file is missing.
 
                         exit /b 1
                     )
@@ -1153,11 +1213,11 @@ pipeline {
 
                     mvn test -Dtest=QuizTesting
 
-                    set "PW_EXIT=%errorlevel%"
+                    set "PW_EXIT=%ERRORLEVEL%"
 
                     echo.
                     echo ==========================================
-                    echo TEST EXIT CODE
+                    echo PLAYWRIGHT TEST EXIT CODE
                     echo ==========================================
 
                     echo %PW_EXIT%
@@ -1170,7 +1230,11 @@ pipeline {
                         echo ==========================================
 
                         echo.
-                        echo Maven test failed.
+                        echo Maven Surefire reports:
+
+                        if exist "target\\surefire-reports" (
+                            dir "target\\surefire-reports"
+                        )
 
                         exit /b %PW_EXIT%
                     )
@@ -1179,12 +1243,68 @@ pipeline {
                     echo ==========================================
                     echo PLAYWRIGHT JAVA TEST PASSED
                     echo ==========================================
-
-                    echo QuizTesting completed successfully.
                 '''
             }
         }
 
+
+        // ============================================================
+        // 14. FINAL VERIFICATION
+        // ============================================================
+
+        stage('Final Verification') {
+
+            steps {
+
+                echo '=========================================='
+                echo 'FINAL QUIZ APP VERIFICATION'
+                echo '=========================================='
+
+                bat '''
+                    @echo off
+
+                    echo.
+                    echo ==========================================
+                    echo BACKEND
+                    echo ==========================================
+
+                    echo http://localhost:8080
+
+                    echo.
+                    echo ==========================================
+                    echo BACKEND API
+                    echo ==========================================
+
+                    echo http://localhost:8080/api/categories
+
+                    echo.
+                    echo ==========================================
+                    echo APPZILLON
+                    echo ==========================================
+
+                    echo http://localhost:9090/quizzz
+
+                    echo.
+                    echo ==========================================
+                    echo TOMCAT PORT
+                    echo ==========================================
+
+                    netstat -ano | findstr :9090
+
+                    echo.
+                    echo ==========================================
+                    echo BACKEND PORT
+                    echo ==========================================
+
+                    netstat -ano | findstr :8080
+
+                    echo.
+                    echo ==========================================
+                    echo QUIZ APP DEPLOYMENT COMPLETED
+                    echo ==========================================
+                '''
+            }
+        }
     }
 
 
@@ -1206,6 +1326,8 @@ pipeline {
 
             echo 'Appzillon: http://localhost:9090/quizzz'
 
+            echo 'Playwright UI Tests: PASSED'
+
             echo '=========================================='
         }
 
@@ -1222,6 +1344,16 @@ pipeline {
 
             echo 'Tomcat logs: D:/apache-tomcat-9.0.53-windows-x64/apache-tomcat-9.0.53/logs'
 
+            echo 'Playwright reports: target/surefire-reports'
+
+            echo '=========================================='
+        }
+
+
+        always {
+
+            echo '=========================================='
+            echo 'JENKINS PIPELINE FINISHED'
             echo '=========================================='
         }
     }
